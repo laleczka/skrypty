@@ -1,15 +1,14 @@
-rat = 'kontrola14';
+rat = 'kontrola15';
 %path_data = ['Z:\Dane doœwiadczalne\eyestim\Multichannel System Data\',rat,'\'];
-path_data = ['C:\Users\L635-10K\Desktop\lic_fiz\szczury\', rat, '\'];
-for file=2:1:16%number of VEPs
+path_data = ['D:\Szczury\', rat, '\'];
+veps = [1, 5, 9, 13];
+for file=1:length(veps)
     %load data with frequency 1000 Hz.
     Fs = 1000;
-    load([path_data, rat, '_VEP', num2str(file),  '_1000Hz.mat']) %contains variable all_data
+    load([path_data, rat, '_VEP', num2str(veps(file)),  '_1000Hz.mat']) %contains variable all_data
     %_spike_mat contains information about number of trials
-    %here the sampling frequency is changed
     chan_no = length(all_data(:,1));
     %Fs2 must be a divisor of Fs
-    %Fs2 = 1000;
     Fs2 = 250;
     all_data2 = zeros(chan_no, length(all_data(1,:))*Fs2/Fs);
     [b,a] = butter(1, 100/(Fs/2),'low'); %Fs2*0.4 cutoff freq must be at least 0.5 of Fs2
@@ -37,7 +36,7 @@ for file=2:1:16%number of VEPs
     tim_off = 1; %time after event in sec
     corr = 0;
     all_dataTrial = zeros(chan_no, (tim_on+tim_off)*Fs2, trials_no);
-    all_dataTrialF = zeros(chan_no, (tim_on+tim_off)*Fs2, trials_no);
+    
     for trial=1:trials_no
         for chan=1:chan_no
             all_dataTrial(chan, :, trial) = all_data2(chan, round(time_ok(trial)-tim_on*Fs2+corr):round(time_ok(trial)+Fs2*tim_off-1+corr));
