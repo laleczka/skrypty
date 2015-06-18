@@ -1,12 +1,12 @@
 function time_ok = find_trigger(path_data, rat, file, Fs2)
-
-    load([path_data, rat, '_VEP', num2str(file), '_spike.mat'])
+    veps = [1,5,9,13];
+    load([path_data, rat, '_VEP', num2str(veps(file)), '_spike.mat'])
     
-    time_spike = eval([rat, '_VEP', num2str(file), '_spike_Ch32.times']);
+    time_spike = eval([rat, '_VEP', num2str(veps(file)), '_spike_Ch32.times']);
     time_spike = round(time_spike*Fs2);
     trials_no = size(time_spike, 1);
     
-    load([path_data, rat, '_VEP', num2str(file), '_D1.mat'])
+    load([path_data, rat, '_VEP', num2str(veps(file)), '_D1.mat'])
     time_D1 = zeros(trials_no, 1);
     time_interval = 1.8*20000;
     stim_begin = find(D1 == 1, 1);

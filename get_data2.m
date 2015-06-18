@@ -1,5 +1,5 @@
 function [data, names] = get_data2(rat, veps)
-    path_In = ['C:\Users\L635-10K\Desktop\lic_fiz\szczury\', rat, '\nowy\'];
+    path_In = ['C:\Users\L635-10K\Desktop\lic_fiz\dane\', rat, '\'];
     load([path_In, rat, '_VEP1.mat_mout.mat']);
     a = size(NDTF_boot);
     data = zeros(a(1), a(2), a(3), a(4), a(5), 4);

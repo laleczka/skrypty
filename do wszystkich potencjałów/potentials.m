@@ -1,23 +1,28 @@
-rat = 'kontrola15';
-path_Out = ['C:\Users\L635-10K\Desktop\lic_fiz\szczury\', rat, '\'];
-path_In = ['C:\Users\L635-10K\Desktop\lic_fiz\szczury\', rat, '\'];
-% veps = {'1','7','11', '15'};
-veps = {'1', '9', '13', '14'};
+rat = 'beta3';
+path_Out = ['C:\Users\L635-10K\Desktop\lic_fiz\dane\', rat, '\'];
+path_In = ['C:\Users\L635-10K\Desktop\lic_fiz\dane\', rat, '\'];
+veps = {'1','7','11', '15'};
+%veps = {'1', '5', '9', '13'};
+%veps = {'1', '8', '12', '16'};
+%channels = {[1, 3,5,6]};
+%channels = {[17,18,20,22]};
+channels = {[16:23]};
+%channels = {[1,4,8,10]};
+struction = {'LGN'};
+time = {'kontrola', 'po 1h', 'po 2h', 'po 3h'};
 data = load([path_In, rat, '_VEP1.mat']);
 [chan_no, samp_no, trial_no] = size(data.all_dataTrial);
 response = zeros(chan_no, samp_no, 4);
 response(:,:,1) = mean(data.all_dataTrial(:,:,:),3);
-for vep = 2:4
-    %for chan = 1:chan_no
+for vep = 2:length(veps)
     data = load([path_In, rat, '_VEP',veps{vep},'.mat']);
     response(:,:,vep) = mean(data.all_dataTrial(:,:,:),3);
 end
-time = {'control', 'after1h', 'after2h', 'after3h'};
-
-%channels = {[1,3,4,6,7,8,9,10], 17:23, 24:31, [33,35,36,37,39,40,42,45]}; %kontrola15
-channels = {1:3, 9:15, 16:23, 25:32};
-struction = {'CxC', 'SC', 'LGN', 'CxI'};
-for s=1:4
+% for v = 1:length(veps)
+%     tmp_res = squeeze(response(channels{1},:,v));
+%     save([path_Out, rat, '_sredni_VEP',num2str(veps{v}),'.mat'], 'tmp_res')
+% end
+for s=1:length(struction)
     file_name = [path_Out, rat, '_',struction{s}, '.png'];
     draw_potential(response,time, channels{s}, struction{s}, file_name)
 end
