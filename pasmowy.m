@@ -9,15 +9,15 @@ function pasmowy(band_dtf, names, rat, path_Out, bands, band, kan_z, kan_d, data
     col = kan_z;
     
     max_value = max(max(max(max(squeeze(band_dtf(row,col,band,:,:, 1,:))))));
-%     limit = max_value * 1.2;
+    limit = max_value * 1.2;
     
-    if band == 3
-        limit = 100;
-    elseif  band == 2
-        limit = 1000;
-    else
-        limit = 6e3;
-    end
+%     if band == 3
+%         limit = 100;
+%     elseif  band == 2
+%         limit = 1000;
+%     else
+%         limit = 6e3;
+%     end
 
     x = -0.2:0.0218:1-0.0218;
     X=[x,fliplr(x)];
@@ -43,13 +43,13 @@ function pasmowy(band_dtf, names, rat, path_Out, bands, band, kan_z, kan_d, data
         %ylabel('Amplituda', 'FontSize',12)
         alpha(0.4)
         set(gca, 'FontSize', 17);
-        if band == 1
-            set(gca,'YTick',[2500, 5000])
-            set(gca,'YTickLabel',{'2500', '5000'})
-        elseif band == 3
-            set(gca,'YTick',[50 100])
-            set(gca,'YTickLabel',{'50', '100'})
-        end
+%         if band == 1
+%             set(gca,'YTick',[2500, 5000])
+%             set(gca,'YTickLabel',{'2500', '5000'})
+%         elseif band == 3
+%             set(gca,'YTick',[50 100])
+%             set(gca,'YTickLabel',{'50', '100'})
+%         end
     end
     if exist([path_Out, names{col}(1:end-1),'_', names{row}(1:end-1),'\'], 'file') == 0
         mkdir([path_Out, names{col}(1:end-1),'_', names{row}(1:end-1),'\'])

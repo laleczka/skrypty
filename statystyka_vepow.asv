@@ -88,12 +88,8 @@ stat = zeros(length(chans), N, 2);
 for c = 1:length(chans)
     for s = 1:N
         a = randi(1200,300,1);
-        stat(c, s, 1) = mean(worek(c, a));
-        stat(c, s, 2) = std(worek(c,a));
-    end
-end
-        
-ss = 1;
+        worek(1, a)
+
 
 
 %plot(squeeze(sred(1,:,:)))

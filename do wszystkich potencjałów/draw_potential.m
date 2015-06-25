@@ -1,6 +1,7 @@
 function draw_potential(response,time, channels, struction, file_name)
 figure()
 ha = tight_subplot(length(channels),1, 0.05, [0.1 0.02], [0.2 0.2]);
+%ha = tight_subplot(length(channels),1, 0.05, [0.3 0.3], [0.05 0.05]);
 x_ax = -0.2:1/250:1-1/250;
 C = {[0.0 0.0 0.0],[0 0 0.9],[0 0.9 0],[0.9 0 0]};
 for i=1:length(channels)

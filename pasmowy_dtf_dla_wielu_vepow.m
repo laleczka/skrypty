@@ -4,14 +4,14 @@ bands = {'name', 'value'};
 % bands.value = {1:4, 4:8, 8:13, 13:30};
 bands.name = {'1-10','10-30','20-40'};
 bands.value = {1:10, 10:30, 20:40};
-rat = 'beta3';
-veps = {'1','7','11','15'};
+% rat = 'beta3';
+% veps = {'1','7','11','15'};
 
 % rat = 'beta4';
 % veps = {'1', '8', '12', '16'};
 
-% rat = 'kontrola15';
-% veps = {'1', '5', '9', '13'};
+rat = 'kontrola15';
+veps = {'1', '5', '9', '13'};
 
 [data, names] = get_data2(rat, veps);
 
@@ -22,7 +22,7 @@ for i=1:length(veps)
     band_dtf(:,:,:,:,i) = compute_bands(data(:,:,:,:,:, i));
 end
 
-kan_z = 6;
+kan_z = 9;
 kan_d = 4;
 for b=1:3
     band = b;
