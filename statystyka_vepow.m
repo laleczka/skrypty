@@ -1,134 +1,112 @@
+%% List of essential information
 rat = 'kontrola15';
-path = ['C:\Users\L635-10K\Desktop\lic_fiz\dane\',rat,'\'];
-% 
-% maks = zeros(4, 300);
-
-% for v=1:length(veps)
-%     load([path, 'kontrola15_VEP',num2str(veps(v)),'.mat'])
-%     for t=1:300
-%         maks(v, t) = max(all_dataTrial(8, 51:75, t))-min(all_dataTrial(8, 51:75, t));
-%         if maks(v,t) <0
-%             disp('ERROR!')
-%         end          
-%     end 
-% end
-% N = 5000;
-% sred = zeros(4,N);
-% for j=1:4
-%     for i=1:N
-%         a = randi(300, 300, 1);
-%         sred(j,i) = mean(maks(j,a));
-%     end
-% end
-% 
-% 
-% 
-% for i=2:4
-%     p = ranksum(maks(1,:), maks(i,:));
-%     disp(['VEP1 i VEP', num2str(i)])
-%     disp(p)
-% end
-% 
-% for i=1:4
-% prctile(sred(i, :),[2.5 97.5])
-% %prctile(maks(i, :),[0 95])
-% end
-% 
-%% Odtad jest dobra, dzialajaca wersja
-% 
-% sred = zeros(4, 300,6);
-% veps = [1,5,9,13];
-% for v=1:length(veps)
-%     load([path, 'kontrola15_VEP',num2str(veps(v)),'.mat'])
-%     for i = 1:6
-%         sred(v,:,i) = mean(all_dataTrial(1, :, 50*(i-1)+i:50*i),3);
-%     end
-% end
-% maks = zeros(4,6);
-% for v=1:length(veps)
-%     for t=1:6
-%         maks(v, t) = max(sred(v, 51:75, t))-min(sred(v, 51:75, t));
-%         if maks(v,t) <0
-%             disp('ERROR!')
-%         end          
-%     end 
-% end
-% 
-% 
-% for i=2:4
-%     %p = mwwtest(maks(1,:), maks(i,:));
-%     p = ranksum(maks(1,:), maks(i,:));
-%     disp(['VEP1 i VEP', num2str(i)])
-%     disp(p)
-% end
-            %a = randperm(300,50);
-            %a = randi(200,50,1);
-
-%losowanko
-
+path = ['D:\Szczury\',rat,'\'];
 veps = [1,5,9,13];
 struction = 'CxC';
 chans = [1,4,8,10];
-N = 100;
-n_set = 300;
-worek = zeros(length(chans),length(veps)*n_set);
-%sred = zeros(length(chans),length(veps), 300, l_sred);
-amplituda = zeros(300,1);
+
+%more detials
+N = 1000; %number of repetitions 
+n_set = 300; %number of trials
+
+sack = zeros(length(chans),length(veps)*n_set); %contains aplitudes of single trials for each channel
+amplitude = zeros(300,1); %temporal variable
+
+%% Loading data and counting amplitudes between 0 - 0.1 s
 for v=1:length(veps)
     load([path, rat,'_VEP',num2str(veps(v)),'.mat'])
     for c = 1:length(chans)
-        for t = 1:n_set
-            amplituda(t) = abs(max(all_dataTrial(chans(c), 51:75, t)))+abs(min(all_dataTrial(chans(c), 51:75, t)));
+        for training = 1:n_set
+            %amplitude is an absolute value in a choosen time band
+            amplitude(training) = abs(max(all_dataTrial(chans(c), 51:75, training)))+abs(min(all_dataTrial(chans(c), 51:75, training)));
         end
-        worek(c, (n_set*(v-1))+1:n_set*v) = amplituda;
+        sack(c, (n_set*(v-1))+1:n_set*v) = amplitude;
     end
 end
-
-stat = zeros(length(chans), N, 2);
+clearvars -except rat path veps struction chans sack N n_set
+%% The statistic starts here
+t_values = zeros(length(chans), N);
+t_real = zeros(length(chans), 3);
 for c = 1:length(chans)
-    for s = 1:N
-        a = randi(1200,300,1);
-        stat(c, s, 1) = mean(worek(c, a));
-        stat(c, s, 2) = std(worek(c,a));
+    %disp(['Channel ', struction, num2str(chans(c))]);
+    for v=1:3
+        %Real data
+        control = [mean(sack(c,1:300)), std(sack(c,1:300))];
+        training = [mean(sack(c,v*300+1:(v+1)*300)), std(sack(c,v*300+1:(v+1)*300))];
+        t_real(c,v) = (training(1)-control(1))/sqrt((control(2)^2+training(2)^2)/n_set);
+        %Bootstrap data
+        control_prim = zeros(N, 2);
+        training_prim = zeros(N, 2);
+        for s = 1:N
+            a = randi(1200,300,1);
+            b = randi(1200,300,1);
+            control_prim(s, 1) = mean(sack(c, a));
+            control_prim(s, 2) = std(sack(c,a));
+            training_prim(s, 1) = mean(sack(c, b));
+            training_prim(s, 2) = std(sack(c,b));
+        end
+        
+        for i = 1:N
+            t_values(c,i) = (training_prim(i,1) - control_prim(i,1))/sqrt((training_prim(i,2).^2+control_prim(i,2).^2)/N);
+        end
     end
 end
-        
-ss = 1;
-
-
-%plot(squeeze(sred(1,:,:)))
-% p_val = zeros(length(chans), 3);
-% for c=1:length(chans)
-%     for i=2:4
-%         p = ranksum(squeeze(amplituda(c,1,:)), squeeze(amplituda(c,i,:)));
-%         p_val(c,i-1) = p;
-%     end
+clearvars -except rat path veps struction chans N n_set t_values t_real
+% for i =1:1
+%     fig=figure;
+%     hax=axes;
+%     y = tpdf(sort(t_values(i,:)), 2*n_set-2);
+%     subplot(1, 1, i)
+%     plot(y)
+%     hold on
+%     t = prctile(t_values(i,:), [2.5 97.5]);
+%     line([25 25],get(hax,'YLim'),'Color',[1 0 0])
 % end
 
-bw_legend = {'kontrola', 'po 1 h','po 2 h','po 3 h'};
-bw_colormap = [0.5 0.5 0.5; 0 0 0.9; 0 0.9 0; 0.9 0 0];
-
-% subplot(2,1,1)
-% barweb([squeeze(mean(amplituda(1,:,:),3));squeeze(mean(amplituda(2,:,:),3))],[std(squeeze(amplituda(1,:,:)),0,2)';std(squeeze(amplituda(2,:,:)),0,2)'], 0.9,{'CxC1'; 'CxC4'},[] , [], 'Amplituda [uV]', bw_colormap, 'y', bw_legend, 2, 'plot');
-% subplot(2,1,2)
-% barweb([squeeze(mean(amplituda(3,:,:),3));squeeze(mean(amplituda(4,:,:),3))],[std(squeeze(amplituda(3,:,:)),0,2)';std(squeeze(amplituda(4,:,:)),0,2)'], 0.9,{'CxC8'; 'CxC10'},[] , [], 'Amplituda [uV]', bw_colormap, 'y', bw_legend, 2, 'axis');
-ha = tight_subplot(1,5, 0.05, [0.05 0.1], [0.1 0.05]);
-for i=1:5
-    axes(ha(i));
-    %figure()
-    if i == 1
-    %barweb(squeeze(mean(amplituda(i,:,:),3)),std(squeeze(amplituda(i,:,:)),0,2)', 0.9,[],['CxC', num2str(chans(i))] , [], 'Amplituda [uV]', bw_colormap, 'y', [], 2, []);
-    barweb(squeeze(mean(amplituda(i,:,:),3)),std(squeeze(amplituda(i,:,:)),0,2)', 0.9,[],[struction, num2str(chans(i)-15)] , [], 'Amplituda [uV]', bw_colormap, 'y',[], 2, []);
-    elseif i<5
-    barweb(squeeze(mean(amplituda(i,:,:),3)),std(squeeze(amplituda(i,:,:)),0,2)', 0.9,[],[struction, num2str(chans(i)-15)] , [], [], bw_colormap, 'y', [], 2, []);
-    else
-        barweb([NaN, NaN, NaN, NaN], [NaN, NaN, NaN, NaN], 0.9, [], [], [],[], bw_colormap, [], bw_legend,1,'plot')
-        %barweb(zeros(4,1), zeros(4,1), [], [], [], [],[], bw_colormap, [], bw_legend,[],[])
-        set(gca,'xtick',[],'ytick',[])
-        axis off
+for j=1:4
+    figure()
+    for i=1:3
+        subplot(3,1,i)
+        V = sort(t_values(j,:));
+        y = tpdf(V, 2*n_set-2);
+        
+        suma_max = 0;
+        suma_min = 0;
+        ind_max = N;
+        ind_min = 1;
+        while suma_max < 4.8577
+            suma_max = suma_max + y(ind_max);
+            ind_max = ind_max - 1;
+        end
+        while suma_min < 4.8577
+            suma_min = suma_min + y(ind_min);
+            ind_min = ind_min + 1;
+        end
+        
+        plot(V,y,'k')
+        xlim([-6.5 6.5])
+        hold on
+        h(1) = area(V(V>V(ind_max+1)), y(V>V(ind_max+1)));
+        h(1).FaceColor = [1 0.9 1];
+        h(2) = area(V(V<V(ind_min-1)), y(V<V(ind_min-1)));
+        h(2).FaceColor = [1 0.9 1];
+        hold on
+        if t_real(j,i)>min(t_values(j,:)) && t_real(j,i)<max(t_values(j,:))
+            line([t_real(j,i) t_real(j,i)],[0 0.2], 'color', [0.8 0 0])
+        else
+            if t_real(j,i)>0
+                line([V(N) V(N)],[0 0.2], 'color', [0.8 0 0])
+            else
+                line([V(1) V(1)],[0 0.2], 'color', [0.8 0 0])
+            end
+        
+        end
     end
-    print(gcf,'-dpng','-r300', [path,rat, '_stat_',struction,'.png']) 
 end
-save([path,rat,'_stat_',struction,'.mat'], 'amplituda')
+% disp(['Control vs ', ' after ', num2str(v), 'h']);
+% disp(prctile(t_values, [2.5 97.5]));
+% disp(t_real)
+% p_value = (sum(y(1:25))+sum(y(976:1000)))/sum(y);
+% disp(['p_value: ', num2str(p_value)])
 
 
