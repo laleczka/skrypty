@@ -1,6 +1,6 @@
 %% List of essential information
 rat = 'kontrola15';
-path = ['D:\Szczury\',rat,'\'];
+path = ['C:\Users\L635-10K\Desktop\lic_fiz\dane\',rat,'\'];
 veps = [1,5,9,13];
 struction = 'CxC';
 chans = [1,4,8,10];
@@ -51,18 +51,11 @@ for c = 1:length(chans)
         end
     end
 end
-clearvars -except rat path veps struction chans N n_set t_values t_real
-% for i =1:1
-%     fig=figure;
-%     hax=axes;
-%     y = tpdf(sort(t_values(i,:)), 2*n_set-2);
-%     subplot(1, 1, i)
-%     plot(y)
-%     hold on
-%     t = prctile(t_values(i,:), [2.5 97.5]);
-%     line([25 25],get(hax,'YLim'),'Color',[1 0 0])
-% end
+limit_min = abs(min(min(t_values(:,:),[],2)));
+limit_max = max(max(t_values(:,:),[],2));
+limit = max(limit_min, limit_max);
 
+clearvars -except rat path veps struction chans N n_set t_values t_real limit
 for j=1:4
     figure()
     for i=1:3
@@ -74,30 +67,32 @@ for j=1:4
         suma_min = 0;
         ind_max = N;
         ind_min = 1;
-        while suma_max < 4.8577
+        while suma_max < sum(y)*0.025
             suma_max = suma_max + y(ind_max);
             ind_max = ind_max - 1;
         end
-        while suma_min < 4.8577
+        while suma_min < sum(y)*0.025
             suma_min = suma_min + y(ind_min);
             ind_min = ind_min + 1;
         end
         
         plot(V,y,'k')
-        xlim([-6.5 6.5])
+        xlim([-1.1*limit 1.1*limit])
         hold on
         h(1) = area(V(V>V(ind_max+1)), y(V>V(ind_max+1)));
-        h(1).FaceColor = [1 0.9 1];
+        set(h(1),'FaceColor',[1 1 0])
+        %h(1).FaceColor = [1 0.9 1];
         h(2) = area(V(V<V(ind_min-1)), y(V<V(ind_min-1)));
-        h(2).FaceColor = [1 0.9 1];
+        set(h(2),'FaceColor',[1 1 0])
+        %h(2).FaceColor = [1 0.9 1];
         hold on
         if t_real(j,i)>min(t_values(j,:)) && t_real(j,i)<max(t_values(j,:))
             line([t_real(j,i) t_real(j,i)],[0 0.2], 'color', [0.8 0 0])
         else
             if t_real(j,i)>0
-                line([V(N) V(N)],[0 0.2], 'color', [0.8 0 0])
+                line([limit limit],[0 0.2], 'color', [0.8 0 0])
             else
-                line([V(1) V(1)],[0 0.2], 'color', [0.8 0 0])
+                line([-limit -limit],[0 0.2], 'color', [0.8 0 0])
             end
         
         end
