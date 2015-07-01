@@ -50,11 +50,13 @@ for c = 1:length(chans)
     t_values(c,:,:) = tmp_boot;
 end
 %%
-for v=1:1
-    disp(['Kana³ 1, kontrola vs po ', num2str(v), ' godzinie']);
-    disp(['Zbiór wartoœci: ', num2str(prctile(squeeze(t_values(1,v,:)), [2.5 97.5]))]);
-    disp(['Wartoœæ statystyki: ', num2str(t_real(1,v))]);
-    disp(['Percentyl: ', num2str(invprctile(squeeze(t_values(1,v,:)), t_real(1,v)))]);
+for c=1:4
+    for v=1:3
+        disp(['Kana³ ', num2str(chans(c)), ' kontrola vs po ', num2str(v), ' godzinie']);
+        disp(['Zbiór wartoœci: ', num2str(prctile(squeeze(t_values(c,v,:)), [2.5 97.5]))]);
+        disp(['Wartoœæ statystyki: ', num2str(t_real(c,v))]);
+        disp(['Percentyl: ', num2str(invprctile(squeeze(t_values(c,v,:)), t_real(c,v)))]);
+    end
 end
 
 V = sort(squeeze(t_values(1,1,:)));
